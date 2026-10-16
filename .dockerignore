@@ -1,0 +1,6 @@
+.env
+.venv
+__pycache__
+data/orders.json
+data/chat_log.jsonl
+data/reports.json

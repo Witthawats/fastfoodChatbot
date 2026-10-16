@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>FastBite แชทสั่งอาหาร</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/app.css" />
+  <script src="/static/vendor/marked.min.js"></script>
+  <script src="/static/vendor/purify.min.js"></script>
+  <script src="/static/vendor/qrcode.js"></script>
+</head>
+<body>
+  <div class="phone" id="phone">
+    <!-- ================= หัวห้องแชท ================= -->
+    <header class="chat-top">
+      <span class="avatar avatar-sm" aria-hidden="true">FB</span>
+      <div class="chat-title">
+        <strong id="shop-name">FastBite</strong>
+        <span id="shop-sub">ตอบกลับทันที</span>
+      </div>
+      <div class="top-actions">
+        <button id="more-btn" class="top-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="ตัวเลือกเพิ่มเติม">⋮</button>
+        <div id="more-menu" class="more-menu hidden" role="menu">
+          <button id="clear-chat" type="button" role="menuitem">ล้างประวัติแชท</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ================= ข้อความ ================= -->
+    <main id="log" class="log" aria-live="polite" aria-label="ข้อความในแชท"></main>
+
+    <!-- ================= ด้านล่าง: quick reply + ช่องพิมพ์ / ริชเมนู ================= -->
+    <div class="bottom">
+      <div id="quick" class="quick" aria-label="ข้อความด่วน"></div>
+
+      <div id="attach-preview" class="attach-preview hidden">
+        <img id="attach-thumb" alt="รูปที่จะส่ง" />
+        <span class="attach-text">แนบรูปแล้ว พิมพ์ข้อความเพิ่มได้ (เช่น เลขออเดอร์)</span>
+        <button id="attach-remove" class="attach-remove" type="button" aria-label="เอารูปออก">✕</button>
+      </div>
+
+      <form id="composer" class="composer hidden">
+        <button id="to-menu" class="icon-btn" type="button" aria-label="แสดงเมนูร้าน">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M3 12h18M12 12v8"/></svg>
+        </button>
+        <button id="attach-btn" class="icon-btn" type="button" aria-label="ส่งรูปภาพ">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="9" cy="10" r="1.6"/><path d="m4 17 5-4.5 3.5 3 3-2.5L20 17"/></svg>
+        </button>
+        <input id="file" type="file" accept="image/*" hidden />
+        <input id="input" placeholder="พิมพ์ข้อความ" autocomplete="off" maxlength="1000" aria-label="ข้อความ" />
+        <button id="send" class="send-btn" type="submit" aria-label="ส่ง" disabled>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12 20 4l-4 16-4-7z"/></svg>
+        </button>
+      </form>
+
+      <div id="menubar" class="menubar">
+        <button id="to-keyboard" class="icon-btn" type="button" aria-label="พิมพ์ข้อความ">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6 10h1M9.5 10h1M13 10h1M16.5 10h1M7 14h10"/></svg>
+        </button>
+        <button id="menu-toggle" class="menubar-label" type="button" aria-expanded="true" aria-controls="richmenu">
+          เมนูร้าน <span class="caret" aria-hidden="true">▾</span>
+        </button>
+      </div>
+
+      <nav id="richmenu" class="richmenu" aria-label="เมนูร้าน">
+        <button class="rm-tile rm-primary" data-action="order" type="button"><span class="rm-ico" aria-hidden="true">🛵</span>สั่งอาหาร</button>
+        <button class="rm-tile" data-action="recommend" type="button"><span class="rm-ico" aria-hidden="true">⭐</span>เมนูแนะนำ</button>
+        <button class="rm-tile" data-action="cart" type="button"><span class="rm-ico" aria-hidden="true">🧺</span>ตะกร้า<span id="rm-cart-badge" class="badge hidden">0</span></button>
+        <button class="rm-tile" data-action="track" type="button"><span class="rm-ico" aria-hidden="true">📍</span>ติดตามออเดอร์</button>
+        <button class="rm-tile" data-action="promo" type="button"><span class="rm-ico" aria-hidden="true">🎁</span>โปรโมชั่น</button>
+        <button class="rm-tile" data-action="contact" type="button"><span class="rm-ico" aria-hidden="true">☎️</span>ติดต่อร้าน</button>
+      </nav>
+    </div>
+
+    <!-- ================= หน้าสั่งอาหาร (เปิดทับแชท แบบ LIFF) ================= -->
+    <section id="liff" class="liff hidden" role="dialog" aria-modal="true" aria-labelledby="liff-title">
+      <div class="liff-sheet">
+        <header class="liff-top">
+          <button id="liff-back" class="top-btn hidden" type="button" aria-label="กลับไปหน้าเมนู">‹</button>
+          <strong id="liff-title">สั่งอาหาร</strong>
+          <button id="liff-close" class="top-btn" type="button" aria-label="ปิด">✕</button>
+        </header>
+
+        <!-- step 1: เมนู -->
+        <div id="step-menu" class="liff-body">
+          <div id="chips" class="chips" role="tablist" aria-label="หมวดเมนู"></div>
+          <div id="menu-list" class="menu-list"></div>
+        </div>
+
+        <!-- step 2: ตะกร้า + ที่อยู่ -->
+        <form id="step-cart" class="liff-body hidden" novalidate>
+          <section class="paper">
+            <h2 class="paper-title">ตะกร้า</h2>
+            <ul id="cart-lines" class="lines"></ul>
+            <p id="cart-empty" class="muted hidden">ตะกร้ายังว่าง เลือกเมนูก่อนนะครับ</p>
+            <div class="free-bar" aria-hidden="true"><span id="free-fill"></span></div>
+            <p id="free-hint" class="hint"></p>
+            <dl class="totals">
+              <div><dt>ค่าอาหาร</dt><dd id="sum-sub">0</dd></div>
+              <div><dt>ค่าจัดส่ง</dt><dd id="sum-fee">0</dd></div>
+              <div class="grand"><dt>รวมทั้งหมด</dt><dd id="sum-total">0</dd></div>
+            </dl>
+          </section>
+
+          <section class="form-block">
+            <h2 class="paper-title">ส่งที่ไหน</h2>
+            <label>ชื่อผู้รับ<input name="name" required maxlength="80" autocomplete="name" /></label>
+            <label>เบอร์โทร<input name="phone" required inputmode="tel" placeholder="0812345678" autocomplete="tel" /></label>
+            <label>ที่อยู่<textarea name="address" required rows="2" minlength="5" placeholder="บ้านเลขที่ ตึก/ห้อง จุดสังเกต" autocomplete="street-address"></textarea></label>
+            <fieldset class="pay"><legend>ชำระเงิน</legend><div id="pay-options" class="pay-options"></div></fieldset>
+            <label>หมายเหตุถึงร้าน<input name="note" maxlength="300" placeholder="เช่น ไม่เผ็ด, ขอใบกำกับภาษี" /></label>
+          </section>
+          <p id="checkout-error" class="error hidden" role="alert"></p>
+        </form>
+
+        <footer class="liff-foot">
+          <p id="min-hint" class="hint error-text hidden"></p>
+          <button id="foot-btn" class="btn-red" type="button" disabled>
+            <span id="foot-label">ดูตะกร้า</span>
+            <span id="foot-total" class="foot-total">0 บาท</span>
+          </button>
+        </footer>
+      </div>
+    </section>
+
+    <div id="toast" class="toast hidden" role="status"></div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

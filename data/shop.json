@@ -1,0 +1,20 @@
+{
+  "name": "FastBite",
+  "tagline": "ฟาสต์ฟู้ดร้อนๆ ส่งถึงหน้าบ้าน",
+  "delivery_fee": 30,
+  "free_delivery_min": 300,
+  "min_order": 100,
+  "delivery_radius_km": 7,
+  "eta_minutes": "30-45",
+  "payment_methods": [
+    "เงินสดปลายทาง",
+    "QR PromptPay"
+  ],
+  "promptpay_name": "FastBite",
+  "promptpay_aliases": [
+    "fastbite",
+    "fast bite",
+    "ฟาสต์ไบท์",
+    "ฟาสไบท์"
+  ]
+}

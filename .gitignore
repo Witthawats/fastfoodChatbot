@@ -1,0 +1,13 @@
+.env
+.venv/
+__pycache__/
+data/orders.json
+data/*.tmp
+data/chat_log.jsonl
+data/reports.json
+# ไฟล์ล็อกตอนเปิด Excel ค้างไว้
+~$*
+# ไฟล์สำรอง Excel ก่อนกรอกผล
+tests/results/test_cases_week12_blank_backup.xlsx
+# รูปอาหารจากเน็ต (ลิขสิทธิ์) ใช้ทดสอบในเครื่องเท่านั้น
+tests/images/food_missing.png
